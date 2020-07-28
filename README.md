@@ -1,13 +1,5 @@
-# http_endless_header
+# sec_tool_belt
 
-Small attack script that tries to overload a TCP Connection by sending an infinite amount of data. If the server is compliant it should abort the connection before running out of memory.
+Security Tool Belt which contains multiple applications for testing application security. Do not use them on a production environment.
 
-Also supports encrypted connections. Simply change:
-
-```rust
-const SERVER: &str = "127.0.0.1:8443";
-const PATH: &str = "/app/";
-const ENCRYPTED: bool = true;
-```
-
-to match your setup.
+* [http_endless_header](./http_endless_header/) - Sends an endless http header to verify that the application aborts the connection.

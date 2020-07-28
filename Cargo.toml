@@ -1,13 +1,5 @@
-[package]
-name = "http_endless_header"
-version = "0.1.0"
-authors = ["Marc Mettke <marc@itmettke.de>"]
-edition = "2018"
-
-[dependencies]
-anyhow = "1.0"
-async-std = "1.6"
-async-tls = { version = "0.9", default-features = false, features = ["client"] }
-futures = "0.3"
-rustls = { version = "0.18", features = ["dangerous_configuration"] }
-webpki = "0.21"
+[workspace]
+members = [
+    "common",
+    "http_endless_header",
+]

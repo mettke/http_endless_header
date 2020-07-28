@@ -1,0 +1,20 @@
+[package]
+name = "common"
+version = "0.1.0"
+authors = ["Marc Mettke <marc@itmettke.de>"]
+edition = "2018"
+description = "common library providing shared stuff"
+license-file = "../LICENSE"
+repository = "https://github.com/mettke/sec_tool_belt"
+readme = "../README.md"
+keywords = ["stb", "data"]
+categories = ["data-structures"]
+
+[dependencies]
+anyhow = "1.0"
+async-std = "1.6"
+async-tls = { version = "0.9", default-features = false, features = ["client"] }
+dotenv = "0.15"
+futures = "0.3"
+rustls = { version = "0.18", features = ["dangerous_configuration"] }
+webpki = "0.21"
