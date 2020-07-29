@@ -1,5 +1,6 @@
 [workspace]
 members = [
     "common",
+    "http_endless_body",
     "http_endless_header",
 ]

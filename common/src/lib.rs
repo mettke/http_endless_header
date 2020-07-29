@@ -1,4 +1,4 @@
-//! `http_endless_header` for overflowing http server with an infinite header
+//! common library providing shared stuff
 
 #![warn(
     absolute_paths_not_starting_with_crate,

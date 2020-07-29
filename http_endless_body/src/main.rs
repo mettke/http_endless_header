@@ -1,4 +1,4 @@
-//! `http_endless_header` for overflowing http server with an infinite header
+//! `http_endless_body` for overflowing http server with an infinite body
 
 #![warn(
     absolute_paths_not_starting_with_crate,
@@ -59,7 +59,7 @@ use common::{
     tcp::connect,
     write, AsyncWriteExt, Result,
 };
-use std::process::exit;
+use std::{process::exit, cmp::max};
 
 const FRAME_SIZE: usize = 1024;
 
@@ -70,34 +70,72 @@ fn main() -> Result<()> {
 
 async fn run() -> Result<i32> {
     setup_env()?;
+    let mut code = 0;
     let env = Env::new()?;
+    code = max(code, content_length_smaller(&env).await?);
+    code = max(code, content_length_insane(&env).await?);
+    Ok(code)
+}
+
+async fn content_length_smaller(env: &Env) -> Result<i32> {
     let mut stream = connect(&env.fqdn_with_port, env.encrypted, true).await?;
     http::write_message(&mut stream, &env.url_returning_200).await?;
     http::write_message(&mut stream, &env.fqdn_with_port).await?;
     http::write_user_agent(&mut stream).await?;
-    let size = write_attack_header(&mut stream).await?;
+    http::write_content_length(&mut stream, 2).await?;
+    http::write_header_end(&mut stream).await?;
+
+    let size = write_attack_body(&mut stream).await?;
     match size {
-        // 2^18
-        Some(total) if total <= 0x0004_0000 => {
+        // 2^20
+        Some(total) if total <= 0x0010_0000 => {
             println!("Wrote {} bytes. This looks like a good limit!", total);
             Ok(0)
         }
         Some(total) => {
             println!(
-                "Wrote {} bytes. Either you do not have a limit or its very high. You may want to set it to 262_144b or lower!",
+                "Wrote {} bytes. Either you do not have a limit or its very high. You may want to set it to 1_048_576b or lower!",
                 total
             );
             Ok(1)
         }
         None => {
-            println!("Aborting as we reached a value outside the usize range while sending data. You may want to introduce a limit to your header parsing!");
+            println!("Aborting as we reached a value outside the usize range while sending data. You may want to introduce a limit to your body parsing!");
             Ok(2)
         }
     }
 }
 
-async fn write_attack_header<S: AsyncWriteExt + Unpin>(stream: &mut S) -> Result<Option<usize>> {
-    write(stream, b"Attack: ").await?;
+async fn content_length_insane(env: &Env) -> Result<i32> {
+    let mut stream = connect(&env.fqdn_with_port, env.encrypted, true).await?;
+    http::write_message(&mut stream, &env.url_returning_200).await?;
+    http::write_message(&mut stream, &env.fqdn_with_port).await?;
+    http::write_user_agent(&mut stream).await?;
+    http::write_content_length(&mut stream, usize::max_value()).await?;
+    http::write_header_end(&mut stream).await?;
+
+    let size = write_attack_body(&mut stream).await?;
+    match size {
+        // 2^20
+        Some(total) if total <= 0x0010_0000 => {
+            println!("Wrote {} bytes. This looks like a good limit!", total);
+            Ok(0)
+        }
+        Some(total) => {
+            println!(
+                "Wrote {} bytes. Either you do not have a limit or its very high. You may want to set it to 1_048_576b or lower!",
+                total
+            );
+            Ok(1)
+        }
+        None => {
+            println!("Aborting as we reached a value outside the usize range while sending data. You may want to introduce a limit to your body parsing!");
+            Ok(2)
+        }
+    }
+}
+
+async fn write_attack_body<S: AsyncWriteExt + Unpin>(stream: &mut S) -> Result<Option<usize>> {
     let buffer = &[0; FRAME_SIZE];
     let mut counter: usize = 0;
     loop {
