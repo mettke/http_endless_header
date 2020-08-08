@@ -40,7 +40,10 @@ pub async fn write_user_agent<S: AsyncWriteExt + Unpin>(stream: &mut S) -> Resul
 /// # Errors
 /// Fails if the OS is unable to write data to the given stream
 #[inline]
-pub async fn write_content_length<S: AsyncWriteExt + Unpin>(stream: &mut S, length: usize) -> Result<()> {
+pub async fn write_content_length<S: AsyncWriteExt + Unpin>(
+    stream: &mut S,
+    length: usize,
+) -> Result<()> {
     write(stream, format!("Content-Length: {}\n", length).as_bytes()).await
 }
 

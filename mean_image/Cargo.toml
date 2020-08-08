@@ -1,0 +1,18 @@
+[package]
+name = "mean_image"
+version = "0.1.0"
+authors = ["Marc Mettke <marc@itmettke.de>"]
+edition = "2018"
+description = "Creates a small image with a manipulated header to attack image software"
+license-file = "../LICENSE"
+repository = "https://github.com/mettke/sec_tool_belt"
+readme = "../README.md"
+keywords = ["stb", "mi"]
+categories = ["command-line-utilities"]
+
+[dependencies]
+common = { path = "../common" }
+crc = "1.8"
+image = "0.23"
+noise = "0.6"
+rand = "0.7"

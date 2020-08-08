@@ -59,7 +59,7 @@ use common::{
     tcp::connect,
     write, AsyncWriteExt, Result,
 };
-use std::{process::exit, cmp::max};
+use std::{cmp::max, process::exit};
 
 const FRAME_SIZE: usize = 1024;
 
