@@ -11,4 +11,5 @@ pub(crate) struct Args {
 pub(crate) enum ImageFormat {
     PNG,
     JPEG,
+    GIF,
 }
