@@ -65,6 +65,7 @@ mod gif;
 mod image;
 mod jpeg;
 mod png;
+mod bmp;
 
 use args::{Args, ImageFormat};
 use clap::derive::Clap;
@@ -83,6 +84,12 @@ pub(crate) fn extract_u32(data: &[u8], start: usize) -> u32 {
     u32::from_be_bytes(buf)
 }
 
+pub(crate) fn extract_u32_le(data: &[u8], start: usize) -> u32 {
+    let mut buf = [0_u8; 4];
+    buf.copy_from_slice(&data[start..start + 4]);
+    u32::from_le_bytes(buf)
+}
+
 pub(crate) fn extract_u16(data: &[u8], start: usize) -> u16 {
     let mut buf = [0_u8; 2];
     buf.copy_from_slice(&data[start..start + 2]);
@@ -97,6 +104,12 @@ pub(crate) fn extract_u16_le(data: &[u8], start: usize) -> u16 {
 
 pub(crate) fn write_u32(data: &mut [u8], start: usize, val: u32) {
     let bytes = val.to_be_bytes();
+    let buf = &mut data[start..start + 4];
+    buf.copy_from_slice(&bytes);
+}
+
+pub(crate) fn write_u32_le(data: &mut [u8], start: usize, val: u32) {
+    let bytes = val.to_le_bytes();
     let buf = &mut data[start..start + 4];
     buf.copy_from_slice(&bytes);
 }
@@ -120,6 +133,7 @@ fn main() -> Result<()> {
         ImageFormat::JPEG => jpeg::create_image(&image),
         ImageFormat::PNG => png::create_image(&image),
         ImageFormat::GIF => gif::create_image(&image),
+        ImageFormat::BMP => bmp::create_image(&image),
     }
 }
 
@@ -129,6 +143,7 @@ fn print_dimension(args: &Args) {
         ImageFormat::JPEG => ::image::image_dimensions("./output.jpeg"),
         ImageFormat::PNG => ::image::image_dimensions("./output.png"),
         ImageFormat::GIF => ::image::image_dimensions("./output.gif"),
+        ImageFormat::BMP => ::image::image_dimensions("./output.bmp"),
     };
     println!("{:?}", d);
 }
@@ -139,6 +154,7 @@ fn open(args: &Args) {
         ImageFormat::JPEG => ::image::open("./output.jpeg"),
         ImageFormat::PNG => ::image::open("./output.png"),
         ImageFormat::GIF => ::image::open("./output.gif"),
+        ImageFormat::BMP => ::image::open("./output.bmp"),
     }
     .expect("Unable to open file");
 }
